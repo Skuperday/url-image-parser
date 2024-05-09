@@ -6,7 +6,7 @@ bing:
   adult_filter: "off"
   looking_limit: 10
   filter: ''
-  bad_sites: [
+  black_list: [
   "static.baza.farpost.ru",
   "mediacloud.carbuyer.co.uk",
   "static.baza.drom.ru",
@@ -70,6 +70,7 @@ bing:
   "ressora-bus.by",
   "www.sktech.ru"
   ]
+  white_list: ["promminer.ru"]
 
   # List of websites to exclude from results
   headers:
@@ -82,11 +83,11 @@ bing:
 
 # File Processing
 # columns: which columns combinates to use
-input_file: "dataset_check.xlsx"
+input_file: "dataset200.xlsx"
 output_file: "result.xlsx"
 sheet_name: "data"
-columns: [0,1]
-strict_columns: [0]
+columns: [1,2]
+strict_columns: [1]
 
 # Concurrency
 concurrency:
