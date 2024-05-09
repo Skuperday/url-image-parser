@@ -3,11 +3,14 @@ import logging
 import re
 import urllib.parse
 import atexit
+from collections import OrderedDict
+
 import yaml
 from multiprocessing import Pool
 
 import aiohttp
 import openpyxl
+import itertools
 
 
 def load_config(filename):
@@ -18,12 +21,28 @@ def load_config(filename):
 config = load_config("config.yaml")
 
 
+def combine_columns(keywords, columns):
+    strict_columns = config['strict_columns']
+    keywords_in_func = keywords.copy()
+    for i in range(len(keywords_in_func)):
+        if i in strict_columns:
+            keywords_in_func[i] = f'"{keywords_in_func[i]}"'
+
+    combinations = set()
+    for combination_size in range(1, len(columns) + 1):
+        for column_subset in itertools.combinations(columns, combination_size):
+            selected_keywords = [str(keywords_in_func[i]) for i in column_subset]
+            sorted_keywords = " ".join(sorted(selected_keywords))
+            combinations.add(sorted_keywords)
+    return list(combinations)
+
+
 def read_keywords_from_xlsx(filename):
     sheet1 = openpyxl.load_workbook(filename, data_only=True)["data"]
     keywords1 = []
     for row1 in sheet1.values:
-        row_filtered = [value for value in row1[:3] if value is not None]  # Фильтрация None
-        if len(row_filtered) >= 2:  # Проверяем, есть ли хотя бы 2 значения
+        row_filtered = [value for value in row1[:3] if value is not None]
+        if len(row_filtered) >= 2:
             keywords1.append(row_filtered)
         if len(row_filtered) < 2:
             return keywords1
@@ -52,47 +71,34 @@ def get_filter(shorthand):
 
 
 async def run(row, looking_limit, adult, filter='', badsites=[]):
-    link_result = ""
-    looking_count = 0
-    seen = set()
+    seen = OrderedDict()
     headers = config['bing']['headers']
-    keyword_phrase = " ".join(str(value) for value in row)
+    columns = config['columns']
 
     async with aiohttp.ClientSession(trust_env=True) as session:
-        while looking_count < looking_limit:
+        combined_columns = combine_columns(row, columns)
+        for keywords in combined_columns:
             try:
                 request_url = (
                         'https://www.bing.com/images/async?q='
-                        + urllib.parse.quote_plus(keyword_phrase)
+                        + urllib.parse.quote_plus(str(keywords))
                         + '&count=' + str(looking_limit)
                         + '&adlt=' + adult
                         + '&qft=' + ('' if filter is None else get_filter(filter))
                 )
                 async with session.get(request_url, headers=headers, timeout=3) as response:
                     html = await response.text()
-
-                    if html == "":
-                        break
-
-                    links = re.findall('murl&quot;:&quot;(.*?)&quot;', html)
-
-                    for link in links:
-                        isbadsite = False
-                        for badsite in badsites:
-                            isbadsite = badsite in link
-                            if isbadsite:
-                                break
-                        if isbadsite:
+                    for link in re.findall('murl&quot;:&quot;(.*?)&quot;', html):
+                        if any(badsite in link for badsite in badsites):
                             continue
-
-                        if looking_count < looking_limit and link not in seen:
-                            link_result = link
-                            seen.add(link)
-                            looking_count += 1
+                        seen[link] = seen.get(link, 0) + 1  # Increment occurrence count
 
             except aiohttp.ClientError as e:
                 logging.error('Error while making request to Bing: %s', e)
-    return link_result
+
+    # Choose the link with the highest occurrence (or the first one if tied)
+    best_link = max(seen, key=seen.get) if seen else ""
+    return best_link
 
 
 async def process_row(row, semaphore, looking_limit, adult, badsites, filter):

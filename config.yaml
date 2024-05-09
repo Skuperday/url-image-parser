@@ -1,0 +1,93 @@
+# Bing: common finder options
+# adult_filter: "off", "moderate", "strict"
+# looking_limit: Number of images to search for each keyword
+# filter: Optional Bing image filters (see get_filter function)
+bing:
+  adult_filter: "off"
+  looking_limit: 10
+  filter: ''
+  bad_sites: [
+  "static.baza.farpost.ru",
+  "mediacloud.carbuyer.co.uk",
+  "static.baza.drom.ru",
+  "topdetal.ru", "avito.ru",
+  "a.allegroimg.com",
+  "toyota-aisin.ph",
+  "media.au.ru",
+  "4.bp.blogspot.com",
+  "img.avito.st",
+  "avatars.mds.yandex.net",
+  "vignette.wikia.nocookie.net",
+  "ce2k.com",
+  "motorzona24.ru",
+  "technipenergies.com",
+  "www.clipartsfree.de",
+  "img2.quasarzone.com",
+  "cdn.wallpapersafari.com",
+  "i.pinimg.com",
+  "images.clipartpanda.com",
+  "clipartnepal.com",
+  "mobiscar.ru",
+  "nvworld.ru",
+  "www.pieseauto.ro",
+  "a.d-cd.net",
+  "toasttab.s3.amazonaws.com",
+  "ricohsklep.pl",
+  "yaraudio.ru",
+  "vnedorozhnik73.ru",
+  "ash54.ru",
+  "www.granico.ru",
+  "dominant-auto.ru",
+  "images.parcafilosu.com.tr",
+  "media.autoexpress.co.uk",
+  "autoblogcar.ru",
+  "images.summitmedia-digital.com",
+  "img1.festima.ru",
+  "truckdrive.ru",
+  "www.port3.ru",
+  "turbotema.ru",
+  "img.plentycar.ru",
+  "images.autodoc.ru",
+  "www.gobizkorea.com",
+  "logan-sandero.ru",
+  "i.ytimg.com",
+  "partsouq.com",
+  "bakurentacars.com",
+  "avtomoe.com",
+  "solarisrio.ru",
+  "img.exist.ru",
+  "shop.lonmadi.ru",
+  "niva-fr.ru",
+  "i.avtopro.es",
+  "klassauto",
+  "uaz-motors.ru",
+  "file.euroauto.ru",
+  "d-detal.com.ua",
+  "to24.com.ua",
+  "item-shopping.c.yimg.jp",
+  "gua.com.ua",
+  "www.transitcenter.bg",
+  "ressora-bus.by",
+  "www.sktech.ru"
+  ]
+
+  # List of websites to exclude from results
+  headers:
+    User-Agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    Accept-Charset: "ISO-8859-1,utf-8;q=0.7,*;q=0.3"
+    Accept-Encoding: "none"
+    Accept-Language: "en-US,en;q=0.8"
+    Connection: "close"
+
+# File Processing
+# columns: which columns combinates to use
+input_file: "dataset_check.xlsx"
+output_file: "result.xlsx"
+sheet_name: "data"
+columns: [0,1]
+strict_columns: [0]
+
+# Concurrency
+concurrency:
+  max_concurrent_requests: 50
