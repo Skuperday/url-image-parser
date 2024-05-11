@@ -41,7 +41,7 @@ def combine_columns(keywords, columns):
     combinations = set()
     for combination_size in range(1, len(columns) + 1):
         for column_subset in itertools.combinations(columns_w_offset, combination_size):
-            selected_keywords = [str(keywords_in_func[i]) for i in column_subset]
+            selected_keywords = [str(keywords_in_func[i]) for i in range(len(column_subset))]
             sorted_keywords = " ".join(sorted(selected_keywords))
             combinations.add(sorted_keywords)
     return list(combinations)
@@ -97,6 +97,7 @@ async def run(row, looking_limit, adult, filter='', badsites=[], white_list=[]):
 
     async with aiohttp.ClientSession(trust_env=True) as session:
         combined_columns = combine_columns(row, columns)
+        print(combined_columns)
         for keywords in combined_columns:
             try:
                 request_url = (
