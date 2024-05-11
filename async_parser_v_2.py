@@ -97,7 +97,6 @@ async def run(row, looking_limit, adult, filter='', badsites=[], white_list=[]):
 
     async with aiohttp.ClientSession(trust_env=True) as session:
         combined_columns = combine_columns(row, columns)
-        print(combined_columns)
         for keywords in combined_columns:
             try:
                 request_url = (
